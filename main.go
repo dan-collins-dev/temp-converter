@@ -1,21 +1,14 @@
 package main
 
 import (
+	"errors"
 	"fmt"
+	"strconv"
 )
 
 func main() {
 	printTitle()
-	printMainOptions()
 	appLoop()
-}
-
-func toCelsius(fTemp float64) float64 {
-	return (fTemp - 32) * (5.0 / 9.0)
-}
-
-func toFahrenheit(cTemp float64) float64 {
-	return (cTemp * (9.0 / 5.0)) + 32
 }
 
 func printTitle() {
@@ -32,29 +25,89 @@ func printMainOptions() {
 
 func appLoop() {
 	for {
-		var choice string
-
-		fmt.Print("\nSelect an option: ")
-		_, err := fmt.Scan(&choice)
+		printMainOptions()
+		choice, err := getChoice()
 
 		if err != nil {
-			fmt.Println("Error reading input:", err)
-			return
+			fmt.Println(err)
+			continue
 		}
 
 		switch choice {
-		case "1":
-			fmt.Println("Fahrenheit Celsius")
+		case 1:
+			tempInput, err := getTemperature()
 
-		case "2":
-			fmt.Println("Celsius to Fahrenheit")
+			if err != nil {
+				fmt.Println(err)
+				continue
+			}
 
-		case "3":
-			fmt.Println("Quitting application")
+			temperature := toCelsius(tempInput)
+			fmt.Printf("\nThe entered temperature in degrees celsius is %.1f\u00b0C\n\n", temperature)
+
+		case 2:
+			tempInput, err := getTemperature()
+
+			if err != nil {
+				fmt.Println(err)
+				continue
+			}
+
+			temperature := toFahrenheit(tempInput)
+			fmt.Printf("\nThe entered temperature in degrees fahrenheit is %.1f\u00b0C\n\n", temperature)
+
+		case 3:
+			fmt.Println("\nQuitting application")
 			return
 
 		default:
-			fmt.Println("Invalid option")
+			fmt.Print("Invalid option.\n\n")
 		}
 	}
+}
+
+func getChoice() (int, error) {
+	var input string
+
+	fmt.Print("\nSelect an option: ")
+	_, err := fmt.Scan(&input)
+
+	if err != nil {
+		return 0, errors.New("Error reading input")
+	}
+
+	num, err := strconv.Atoi(input)
+
+	if err != nil {
+		return 0, errors.New("\nEntered input cannot be converted to an integer.\n")
+	}
+
+	return num, nil
+}
+
+func getTemperature() (float64, error) {
+	var input string
+
+	fmt.Print("Enter the temperature to convert: ")
+	_, err := fmt.Scan(&input)
+
+	if err != nil {
+		return 0, errors.New("Error reading input")
+	}
+
+	temp, err := strconv.ParseFloat(input, 64)
+
+	if err != nil {
+		return 0, errors.New("\nEntered input cannot be converted to a float.\n")
+	}
+
+	return temp, nil
+}
+
+func toCelsius(fTemp float64) float64 {
+	return (fTemp - 32) * (5.0 / 9.0)
+}
+
+func toFahrenheit(cTemp float64) float64 {
+	return (cTemp * (9.0 / 5.0)) + 32
 }
