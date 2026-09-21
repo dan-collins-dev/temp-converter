@@ -1,7 +1,5 @@
 # temp-converter
 
-## Overview
-
 ### Description
 
 *Note to self: update after init commit*
@@ -23,10 +21,16 @@ git clone https://github.com/dan-collins-dev/temp-converter.git
 cd temp-converter
 ```
 
-To run the program
+To build and run the program on MacOS and Linux
 
 ```bash
-go run main.go
+go build -o bin/tempconverter
+./bin/tempconverter
 ```
 
-*Note to self: Add build and run app commands later*
+To build and run the program in Powershell
+
+```powershell
+go build -o bin/tempconverter.exe
+.\bin\tempconverter.exe
+```
