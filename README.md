@@ -1,6 +1,6 @@
 # temp-converter
 
-<div style="width: 70%; margin: 0 auto">
+<div style="display: flex; width: 100%; justify-content: center">
     <img src="docs/demo.gif" alt="Application demonstration gif">
 </div>
 
