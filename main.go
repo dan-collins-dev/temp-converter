@@ -1,107 +1,60 @@
 package main
 
 import (
-	"errors"
 	"fmt"
 	"strconv"
+
+	"github.com/rivo/tview"
 )
 
 func main() {
-	printTitle()
-	appLoop()
-}
+	tempInput := tview.NewInputField().
+		SetLabel("Input the temperature you would like to convert: ").SetFieldWidth(10)
 
-func printTitle() {
-	fmt.Println("===============================")
-	fmt.Println("| Temperature Converter in Go |")
-	fmt.Println("===============================")
-}
+	dropdown := tview.NewDropDown().
+		SetLabel("Select the unit you want to convert to: ").
+		SetOptions([]string{"Celsius", "Fahrenheit"}, nil)
 
-func printMainOptions() {
-	fmt.Println("[1] Convert temperature from Fahrenheit to Celsius")
-	fmt.Println("[2] Convert temperature from Celsius to Fahrenheit")
-	fmt.Println("[3] Quit Program")
-}
+	result := tview.NewTextView().SetText("Result: ")
+	app := tview.NewApplication()
 
-func appLoop() {
-	for {
-		printMainOptions()
-		choice, err := getChoice()
-
-		if err != nil {
-			fmt.Println(err)
-			continue
-		}
-
-		switch choice {
-		case 1:
-			tempInput, err := getTemperature()
-
+	form := tview.NewForm().
+		AddFormItem(tempInput).
+		AddFormItem(dropdown).
+		AddFormItem(result).
+		AddButton("Submit", func() {
+			value, err := strconv.ParseFloat(tempInput.GetText(), 64)
 			if err != nil {
-				fmt.Println(err)
-				continue
+				result.SetText("Result: Please enter a valid number")
+				return
 			}
 
-			temperature := toCelsius(tempInput)
-			fmt.Printf("\nThe entered temperature in degrees celsius is %.1f\u00b0C\n\n", temperature)
+			selectedIndex, selected := dropdown.GetCurrentOption()
 
-		case 2:
-			tempInput, err := getTemperature()
+			var output string
 
-			if err != nil {
-				fmt.Println(err)
-				continue
+			if selectedIndex == 0 {
+				output = fmt.Sprintf("Result: %.1f°F = %.1f°C", value, toCelsius(value))
+			} else if selectedIndex == 1 {
+				output = fmt.Sprintf("Result: %.1f°C = %.1f°F", value, toFahrenheit(value))
+			} else {
+				result.SetText("A unit must be selected")
+				return
 			}
+			_ = selected
 
-			temperature := toFahrenheit(tempInput)
-			fmt.Printf("\nThe entered temperature in degrees fahrenheit is %.1f\u00b0C\n\n", temperature)
+			result.SetText(output)
+			tempInput.SetText("")
+		}).
+		AddButton("Quit", func() {
+			app.Stop()
+		})
 
-		case 3:
-			fmt.Println("\nQuitting application")
-			return
+	app.SetRoot(form, true)
 
-		default:
-			fmt.Print("Invalid option.\n\n")
-		}
+	if err := app.EnableMouse(true).Run(); err != nil {
+		panic(err)
 	}
-}
-
-func getChoice() (int, error) {
-	var input string
-
-	fmt.Print("\nSelect an option: ")
-	_, err := fmt.Scan(&input)
-
-	if err != nil {
-		return 0, errors.New("Error reading input")
-	}
-
-	num, err := strconv.Atoi(input)
-
-	if err != nil {
-		return 0, errors.New("\nEntered input cannot be converted to an integer.\n")
-	}
-
-	return num, nil
-}
-
-func getTemperature() (float64, error) {
-	var input string
-
-	fmt.Print("Enter the temperature to convert: ")
-	_, err := fmt.Scan(&input)
-
-	if err != nil {
-		return 0, errors.New("Error reading input")
-	}
-
-	temp, err := strconv.ParseFloat(input, 64)
-
-	if err != nil {
-		return 0, errors.New("\nEntered input cannot be converted to a float.\n")
-	}
-
-	return temp, nil
 }
 
 func toCelsius(fTemp float64) float64 {
