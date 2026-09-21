@@ -1,11 +1,13 @@
 # temp-converter
 
-### Description
+<div style="width: 70%; margin: 0 auto">
+    <img src="docs/demo.gif" alt="Application demonstration gif">
+</div>
 
-*Note to self: update after init commit*
-### 
+A simple temperature conversion app built with [tview](https://github.com/rivo/tview). Built for the purposes of learning Go.
 
-# How to Run
+
+## How to Run
 
 ### Required Tools
 
